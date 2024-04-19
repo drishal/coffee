@@ -115,35 +115,38 @@ impl<'a> Coffee<'a> {
         arguments: Option<*const u8>,
         argument_size: Option<usize>,
         entrypoint_name: Option<String>,
-    ) -> Result<()> {
+    // ) -> Result<()> {
+    ) -> String{
         // Check if COFF is running on the current architecture
-        if self.is_x86()? && cfg!(target_arch = "x86_64") {
+        if self.is_x86().unwrap() && cfg!(target_arch = "x86_64") {
             panic!("Cannot run x86 COFF on x86_64 architecture");
-        } else if self.is_x64()? && cfg!(target_arch = "x86") {
+        } else if self.is_x64().unwrap() && cfg!(target_arch = "x86") {
             panic!("Cannot run x64 COFF on i686 architecture");
         }
 
         // Allocate memory for the bof
-        self.allocate_bof_memory()?;
+        self.allocate_bof_memory().unwrap();
 
         // Execute the bof
-        self.execute_bof(arguments, argument_size, entrypoint_name)?;
+        self.execute_bof(arguments, argument_size, entrypoint_name).unwrap();
 
         // Get the output and print it
         let output_data = beacon_get_output_data();
 
         // Print output data
-        if output_data.len() > 0 {
-            println!("{}", output_data.flush());
-        }
+        // if output_data.len() > 0 {
+            // println!("{}", output_data.flush());
+        // }
+        let out = output_data.flush();
 
         // Reset the output data
         output_data.reset();
 
         // Free the memory of all sections
-        self.free_bof_memory()?;
+        // self.free_bof_memory()?;
 
-        Ok(())
+        out
+        // Ok(())
     }
 
     /// This is a bit too repetitive
